@@ -13,7 +13,6 @@ private:
     std::string o_symbol{ "O" };
     std::unique_ptr<UI> ui = std::make_unique<UI>();
     void init_board();
-    //auto color(std::string string) const;
 protected:
     std::string board[3][3];
     std::string board_numbers[3][3];
@@ -29,7 +28,6 @@ public:
     bool is_game_over() const;
     std::string get_winning_symbol() const;
     void reset();
-    void debug();
     ~Board() = default;
 
 };

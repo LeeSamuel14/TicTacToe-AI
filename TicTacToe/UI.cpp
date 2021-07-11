@@ -8,10 +8,20 @@ void UI::color(std::string& to_color, std::string& color) const
     }
 }
 
-void UI::color(const std::string& to_color) const
+void UI::color_purple(const std::string& to_color) const
 {
     std::cout << dye::purple_on_black(to_color);
 }
+
+void UI::color_red(const std::string& to_color) const
+{
+    std::cout << dye::red_on_black(to_color);
+}
+void UI::color_green(const std::string& to_color) const
+{
+    std::cout << dye::green_on_black(to_color);
+}
+
 
 void UI::color(const char* to_color) const
 {
@@ -111,4 +121,14 @@ void  UI::play_again() const
 void  UI::select_number() const
 {
     std::cout << dye::light_green_on_black(select_number_text);
+}
+
+void UI::your_difficulty() const
+{
+    std::cout << dye::light_purple_on_black(your_difficulty_text);
+}
+
+void UI::select_difficulty() const
+{
+    std::cout << dye::light_green_on_black(select_difficulty_text);
 }

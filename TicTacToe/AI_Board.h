@@ -8,5 +8,4 @@ private:
 public:
     AI_Board();
     void remove_move(const int&, const int&);
-    //bool is_game_over() const;
 };

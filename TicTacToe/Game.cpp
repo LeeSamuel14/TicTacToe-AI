@@ -3,29 +3,36 @@
 void Game::init_game()
 {
     ui->intro();
-   ai->ai_board->draw();
+    ai->ai_board->draw();
     Game::init_players();
+    Game::init_difficulty();
     std::system("pause");
     Game::init_game_loop();
 }
 
 void Game::init_players()
 {
-    int user_choice = Game::select_player();
+    user_player = std::make_unique<Player>("X");
+    pc_player = std::make_unique<Player>("O");
+}
+
+void Game::init_difficulty()
+{
+    int user_choice = Game::select_difficulty();
     switch (user_choice)
     {
     case 1:
     {
-        user_player = std::make_unique<Player>("X");
-        pc_player = std::make_unique<Player>("O");
+        difficulty = "easy";
         break;
     }
     case 2:
     {
-        user_player = std::make_unique<Player>("O");
-        pc_player = std::make_unique<Player>("X");
+        difficulty = "hard";
         break;
     }
+    default:
+        difficulty = "easy";
 
     }
 }
@@ -37,15 +44,27 @@ void Game::init_game_loop()
     {
         Game::clear_console();
         ui->new_game();
-       ai->ai_board->draw();
+        ai->ai_board->draw();
         Game::ui_players_scores();
         while (!ai->ai_board->is_game_over())
         {
-            Game::pc_turn();
-            Game::clear_console();
-            ai->ai_board->draw();
-            if (ai->ai_board->is_game_over()) break;
-            Game::user_turn();
+            if (difficulty == "easy")
+            {
+                Game::user_turn();
+                Game::clear_console();
+                if (ai->ai_board->is_game_over()) break;
+                Game::pc_turn();
+            }
+            else
+            {
+                Game::pc_turn();
+                Game::clear_console();
+                ai->ai_board->draw();
+                ui->color_red(std::string{ "PC PLAYED \nYOUR TURN\n" });
+                if (ai->ai_board->is_game_over()) break;
+                Game::user_turn();
+            }
+            
         }
         first_play = true;
         Game::determine_win();
@@ -56,6 +75,8 @@ void Game::init_game_loop()
         std::cin >> user_i;
         if (user_i != "y" && user_i != "Y") {
             play_again = false;
+            Game::clear_console();
+            Game::init_game();
         }
         else {
             Game::clear_console();
@@ -107,13 +128,12 @@ bool Game::play(int row, int col)
     return ai->ai_board->play(row, col);
 }
 
-int Game::select_player() const
+int Game::select_difficulty() const
 {
     bool correct_input{ true };
     std::string user_input;
     do {
-        ui->select_player();
-        ui->your_player_choice();
+        ui->select_difficulty();
         std::cin >> user_input;
         if (user_input != "1" && user_input != "2")
         {
@@ -123,7 +143,11 @@ int Game::select_player() const
         else
         {
             correct_input = true;
-            user_input == "1" ? ui->player_x() : ui->player_o();
+            ui->your_difficulty();
+            if (user_input == "1")
+                ui->color_green(std::string{ "EASY\n\n" } );
+            else 
+                ui->color_red(std::string{ "HARD\n\n" });
 
         }
     } while (!correct_input);
@@ -145,43 +169,17 @@ void Game::user_turn()
 void Game::pc_turn()
 {
     ui->pc_loading();
-    bool valid_play_pc{true};
-    do
+    if (difficulty == "easy")
     {
-        if(first_play)
-        {
-            time_t timer{};
-            const int min{ 0 };
-            const int max{ 2 };
-            srand(time(&timer));
-            int row = rand() % (max - min + 1) + min;
-            int col = rand() % (max - min + 1) + min;
-            ai->ai_board->play(row, col, "O");
-            first_play = false;
-        }
-        else
-        {
-            ai->mini_max(is_max, 0); //count
-            std::cout << ai->winning_row_min << " ";
-            std::cout << ai->winning_col_min << "";
-            //if (!is_max) ai->ai_board->play(ai->winning_row_min, ai->winning_col_min, "O");
-            valid_play_pc = ai->ai_board->play(ai->winning_row_max, ai->winning_col_max, "O");
-            if (!valid_play_pc)
-            {
-                valid_play_pc = ai->ai_board->play(ai->winning_row_min, ai->winning_col_min, "O");
-            }
-            //if (is_max) ai->ai_board->play(ai->winning_row_max, ai->winning_col_max, "O");
-            ai->reset();
-            std::cout << "Choice Made";
-            is_max = !is_max;
-        }
-        
-        //ai->mini_max
-        //int pc_choice = pc_player->pc_choice(); //#lee pass in board here
-        //valid_play_pc = Game::play(ai->winning_row_min, ai->winning_col_min);
-    } while (!valid_play_pc);
+        Game::pc_easy_difficulty();
+    }
+    else
+    {
+        Game::pc_hard_difficulty();
+    }
+
    ai->ai_board->draw();
-    ui->pc_complete();
+   ui->pc_complete();
 }
 
 void Game::ui_players_scores() const
@@ -220,4 +218,54 @@ void Game::determine_win() const
 void Game::clear_console() const
 {
     std::system("cls");
+}
+
+void  Game::pc_hard_difficulty()
+{
+    bool valid_play_pc{ true };
+
+    do
+    {
+        if (first_play)
+        {
+            time_t timer{};
+            const int min{ 0 };
+            const int max{ 2 };
+            srand(time(&timer));
+            int row = rand() % (max - min + 1) + min;
+            int col = rand() % (max - min + 1) + min;
+            ai->ai_board->play(row, col, "O");
+            first_play = false;
+        }
+        else
+        {
+            ai->mini_max(is_max, 0); //count
+            std::cout << ai->winning_row_min << " ";
+            std::cout << ai->winning_col_min << "";
+            valid_play_pc = ai->ai_board->play(ai->winning_row_max, ai->winning_col_max, "O");
+            if (!valid_play_pc)
+            {
+                valid_play_pc = ai->ai_board->play(ai->winning_row_min, ai->winning_col_min, "O");
+            }
+            ai->reset();
+            std::cout << "Choice Made";
+            is_max = !is_max;
+        }
+    } while (!valid_play_pc);
+}
+
+void Game::pc_easy_difficulty()
+{
+    bool valid_play_pc{ true };
+
+    do
+    {
+        time_t timer{};
+        const int min{ 0 };
+        const int max{ 2 };
+        srand(time(&timer));
+        int row = rand() % (max - min + 1) + min;
+        int col = rand() % (max - min + 1) + min;
+        valid_play_pc = ai->ai_board->play(row, col, "O");
+    } while (!valid_play_pc);
 }

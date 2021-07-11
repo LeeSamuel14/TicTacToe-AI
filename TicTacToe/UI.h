@@ -24,9 +24,14 @@ private:
     std::string pc_loading_text{ "\nCOMPUTER THINKING...\n" };
     std::string pc_complete_text{ "\nYOUR TURN...\n" };
     std::string select_number_text{ "\nSELECT NUMBER ON BOARD:  \n" };
+    std::string your_difficulty_text{ "\nYOU ARE PLAYING ON:  \n" };
+    std::string select_difficulty_text{ "\nSELECT A DIFFICULTY: \n\n1 - EASY (SLOW)\n2 - HARD (AI & FAST)\n\nENTER NUMBER: " };
 public:
     void color(std::string& to_color, std::string& color) const;
+    void color_purple(const std::string& to_color) const;
     void color(const std::string& to_color) const;
+    void color_red(const std::string& to_color) const;
+    void color_green(const std::string& to_color) const;
     void color(const char* to_color) const;
     void color_symbol(const std::string& symbol) const;
     void intro() const;
@@ -43,6 +48,8 @@ public:
     void player_o() const;
     void play_again() const;
     void select_number() const;
+    void your_difficulty() const;
+    void select_difficulty() const;
     void player_score(const int& score) const;
     void pc_score(const int& score) const;
     UI() = default;
