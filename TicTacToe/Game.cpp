@@ -3,7 +3,6 @@
 void Game::init_game()
 {
     ui->intro();
-    ai->ai_board->draw();
     Game::init_players();
     Game::init_difficulty();
     std::system("pause");
